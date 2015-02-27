@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="assets/img/favicon.png">
+
+    <title>Truck Owner - Today's Menu</title>
+
+    <link rel="stylesheet" type="text/css" href="assets/css/demo.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/style1.css" />
+
+    <!-- Bootstrap core CSS -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="assets/css/main.css" rel="stylesheet">
+
+    <!-- Fonts from Google Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAjU0EJWnWPMv7oQ-jjS7dYxSPW5CJgpdgO_s4yyMovOaVh_KvvhSfpvagV18eOyDWu7VytS6Bi1CWxw"
+            type="text/javascript"></script>
+    <script type="text/javascript">
+        var map = null;
+        var geocoder = null;
+
+        function initialize() {
+            if (GBrowserIsCompatible()) {
+                map = new GMap2(document.getElementById("map_canvas"));
+                map.setCenter(new GLatLng("{{latitude}}", "{{longitude}}"), 15);
+                map.setUIToDefault();
+                geocoder = new GClientGeocoder();
+                var loc = new google.maps.LatLng("{{latitude}}", "{{longitude}}");
+                markerOptions = { title:"Your current position is set here" };
+                var initmarker = new GMarker(loc);
+                map.addOverlay(initmarker);
+                initmarker.openInfoWindowHtml("Your current position is set here");
+            }
+        }
+
+        function showAddress(address) {
+            if (geocoder) {
+                geocoder.getLatLng(
+                        address,
+                        function(point) {
+                            if (!point) {
+                                alert(address + " not found");
+                            } else {
+                                map.setCenter(point, 15);
+                                var marker = new GMarker(point, {draggable: false});
+                                var lat = document.getElementById('latitudeText');
+                                lat.value = point.lat()
+                                var longi = document.getElementById('longitudeText');
+                                longi.value = point.lng();
+                                map.clearOverlays();
+                                map.addOverlay(marker);
+                                GEvent.addListener(marker, "dragend", function() {
+                                    marker.openInfoWindowHtml("Your new location "+marker.getLatLng().toUrlValue(6));
+                                });
+                                GEvent.addListener(marker, "click", function() {
+                                    marker.openInfoWindowHtml("Your new location "+marker.getLatLng().toUrlValue(6));
+                                });
+                                GEvent.trigger(marker, "click");
+                            }
+                        }
+                );
+
+
+            }
+        }
+
+        function SumbitFunction(){
+
+            document.forms["form"].submit();
+        }
+    </script>
+</head>
+<body  onload="initialize()" onunload="GUnload()">
+<div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <h1 class="navbar-brand">
+                <b>TruckStop</b>
+            </h1>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <button type="submit" class="btn btn-warning btn-header">LOGOUT</button>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-left">
+                <li><input type="text" class="form-control-header-rounded col-lg-push-1" placeholder="Search"></li>
+                <li><button type="submit" class="btn btn-warning btn-header">SEARCH</button></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</div>
+<div id="headerwrap">
+    <ul class="cb-slideshow">
+        <li><span>Image 01</span><div><h3></h3></div></li>
+        <li><span>Image 02</span><div><h3></h3></div></li>
+        <li><span>Image 03</span><div><h3></h3></div></li>
+        <li><span>Image 04</span><div><h3></h3></div></li>
+        <li><span>Image 05</span><div><h3></h3></div></li>
+        <li><span>Image 06</span><div><h3></h3></div></li>
+    </ul>
+    <div id="mapdiv" class="container">
+        <div class="row">
+            <div class="col-lg-6 col-lg-offset-3">
+                <h1 class="control-label">What are you serving today?</h1>
+                <form id="menu" method="post" class="form-inline" role="form" onsubmit="showAddress(this.address.value); return false">
+                    <input type="text" class="form-control"  name="address" placeholder="Enter Address for food-truck" value="" />
+                    <input type="submit" class="btn btn-warning btn-lg joinbtn" style="margin-left:5px;margin-bottom:10px;width:60px;" value="Go!" onsumbit="showAddess(this.address.value);"/>
+                    <input type="hidden"  id="latitudeText" name = "latitudeText"/>
+                    <input type="hidden" id="longitudeText" name = "longitudeText"/>
+                    <div id="map_canvas" style="width: 400px; height: 400px; margin-top:5px;margin-bottom: 7px; margin-left:70px;"></div>
+                    <textarea id="txtareamenu" name="todaysMenu" class="form-control" data-role="tagsinput" placeholder="Today's Menu" rows="4" cols="10"></textarea>
+                    <textarea id="txtareatags" name="todaysMenuTags" class="form-control" placeholder="Menu Tags" rows="4" cols="10"></textarea>
+                    <br>
+                    <button type="button" class="btn btn-warning btn-lg joinbtn" onclick="validateServingMenu()">STORE MENU</button>
+                </form>
+            </div>
+            <!--<div class="col-lg-6">-->
+            <!--<form id="form" action="#" onsubmit="showAddress(this.address.value); return false">-->
+            <!--<p>-->
+            <!--</p-->
+            <!--</form>-->
+            <!--</div>-->
+        </div>
+    </div>
+    <div class="container">
+        <hr>
+        <p class="footer centered" style="font-weight: bolder;">©2014 TruckStop &nbsp; &nbsp;Created by sAaPkUnUvA</p>
+        <p class="footer centered" style="font-weight: bolder;"></p>
+    </div><!-- /container -->
+</div>
+<!-- Bootstrap core JavaScript
+  ================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="assets/js/modernizr.custom.86080.js"></script>
+<script type="text/javascript">
+    function validateServingMenu(){
+        if($("#txtareamenu").val() == "") {
+            $("#txtareamenu").addClass("errorClass");
+            $("#txtareamenu").attr('placeholder', "Please provide today's menu");
+            $("#txtareamenu").addClass("errorplaceHolder");
+        }
+        if($("#txtareatags").val() == "") {
+            $("#txtareatags").addClass("errorClass");
+            $("#txtareatags").attr('placeholder', "Please provide tags for menu");
+            $("#txtareatags").addClass("errorplaceHolder");
+        }
+        else {
+
+            document.forms["menu"].submit();
+        }
+    }
+</script>
+</body>
+</html>
